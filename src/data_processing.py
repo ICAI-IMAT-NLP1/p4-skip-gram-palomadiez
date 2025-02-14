@@ -96,20 +96,25 @@ def get_target(words: List[str], idx: int, window_size: int = 5) -> List[str]:
     # TODO
     r = random.randint(1,window_size)
     target_words: List[str] = []
+    vocab_int, int_vocab = create_lookup_tables(words)
+    if words:
+        #int_words = [vocab_int[w] for w in words]
+        int_words = words
+        if idx<r:
+            for i in int_words[:idx]:
+                target_words.append(i)
+        else:
+            for i in range(-r, 0):
+                target_words.append(int_words[idx+i])
 
-    if idx<r:
-        for i in words[:idx]:
-            target_words.append(i)
+        if len(int_words)-idx <= r:
+            for i in int_words[idx+1:]:
+                target_words.append(i)
+        else:
+            for i in range(idx+1, idx+r+1):
+                target_words.append(int_words[i])
     else:
-        for i in range(-r, 0):
-            target_words.append(words[idx+i])
-
-    if len(words)-idx <= r:
-        for i in words[idx+1:]:
-            target_words.append(i)
-    else:
-        for i in range(idx+1, idx+r+1):
-            target_words.append(words[i])
+        target_words = []
 
     return target_words
 
@@ -134,8 +139,13 @@ def get_batches(words: List[int], batch_size: int, window_size: int = 5) -> Gene
 
     # TODO
     for idx in range(0, len(words), batch_size):
-        inputs: List[int] = None
-        targets: List[int] = None
+        inputs: List[int] = []
+        targets: List[int] = []
+        target_words = get_target(words, idx, window_size)
+        for w in target_words:
+            inputs.append(words[idx])
+            targets.append(w)
+
         yield (inputs, targets)
 
 def cosine_similarity(embedding: torch.nn.Embedding, valid_size: int = 16, valid_window: int = 100, device: str = 'cpu'):
