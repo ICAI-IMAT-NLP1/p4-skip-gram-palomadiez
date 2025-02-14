@@ -1,6 +1,7 @@
 from typing import List, Tuple, Dict, Generator
 from collections import Counter
 import torch
+import random
 
 try:
     from src.utils import tokenize
@@ -73,7 +74,9 @@ def subsample_words(words: List[str], vocab_to_int: Dict[str, int], threshold: f
     # Convert words to integers
     int_words: List[int] = None
     
-    freqs: Dict[str, float] = None
+    freqs: Dict[str, float] = dict(Counter(words))
+
+    subsampling_prob = {word: (1-torch.sqrt(torch.tensor(threshold/freqs[word]))) for word in freqs.keys()}
     train_words: List[str] = None
 
     return train_words, freqs
@@ -91,7 +94,22 @@ def get_target(words: List[str], idx: int, window_size: int = 5) -> List[str]:
         List[str]: A list of words selected randomly within the window around the target word.
     """
     # TODO
-    target_words: List[str] = None
+    r = random.randint(1,window_size)
+    target_words: List[str] = []
+
+    if idx<r:
+        for i in words[:idx]:
+            target_words.append(i)
+    else:
+        for i in range(-r, 0):
+            target_words.append(words[idx+i])
+
+    if len(words)-idx <= r:
+        for i in words[idx+1:]:
+            target_words.append(i)
+    else:
+        for i in range(idx+1, idx+r+1):
+            target_words.append(words[i])
 
     return target_words
 
