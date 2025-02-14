@@ -23,7 +23,7 @@ def load_and_preprocess_data(infile: str) -> List[str]:
 
     # Preprocess and tokenize the text
     # TODO
-    tokens: List[str] = None
+    tokens: List[str] = tokenize(text)
 
     return tokens
 
@@ -95,7 +95,7 @@ def get_target(words: List[str], idx: int, window_size: int = 5) -> List[str]:
 
     return target_words
 
-def get_batches(words: List[int], batch_size: int, window_size: int = 5) -> Generator[Tuple[List[int], List[int]]]:
+def get_batches(words: List[int], batch_size: int, window_size: int = 5) -> Generator[None, None, None]:
     """Generate batches of word pairs for training.
 
     This function creates a generator that yields tuples of (inputs, targets),
@@ -116,8 +116,9 @@ def get_batches(words: List[int], batch_size: int, window_size: int = 5) -> Gene
 
     # TODO
     for idx in range(0, len(words), batch_size):
-        inputs, targets: Tuple[List[int], List[int]] = None, None
-        yield inputs, targets
+        inputs: List[int] = None
+        targets: List[int] = None
+        yield (inputs, targets)
 
 def cosine_similarity(embedding: torch.nn.Embedding, valid_size: int = 16, valid_window: int = 100, device: str = 'cpu'):
     """Calculates the cosine similarity of validation words with words in the embedding matrix.
