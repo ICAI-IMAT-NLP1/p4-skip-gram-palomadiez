@@ -72,9 +72,9 @@ def subsample_words(words: List[str], vocab_to_int: Dict[str, int], threshold: f
     """
     # TODO
     # Convert words to integers
-    int_words: List[int] = None
+    int_words: List[int] = [vocab_to_int[word] for word in words]
     
-    freqs: Dict[str, float] = dict(Counter(words))
+    freqs: Dict[str, float] = dict(Counter(int_words))
 
     subsampling_prob = {word: (1-torch.sqrt(torch.tensor(threshold/freqs[word]))) for word in freqs.keys()}
     train_words: List[str] = None
@@ -171,6 +171,6 @@ def cosine_similarity(embedding: torch.nn.Embedding, valid_size: int = 16, valid
 
     # TODO
     valid_examples: torch.Tensor = None
-    similarities: torch.Tensor = None
+    similarities: torch.Tensor = [(a*b)/(torch.abs(a)*torch.abs(b))]
 
     return valid_examples, similarities
