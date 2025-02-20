@@ -142,7 +142,6 @@ class NegativeSamplingLoss(nn.Module):
 
         # Return the negative sum of the correct and noisy log-sigmoid losses, averaged over the batch
         # TODO
-
         total_loss = -(out_loss+noise_loss).mean()
 
         return total_loss
