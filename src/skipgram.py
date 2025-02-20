@@ -127,17 +127,17 @@ class NegativeSamplingLoss(nn.Module):
         """
         batch_size = input_vectors.shape[0]
         embed_size = input_vectors.shape[1]
-        input_vectors = input_vectors.unsqueeze(1)
+        input_vectors = input_vectors.unsqueeze(2)
         output_vectors = output_vectors.unsqueeze(2)
         
         # Compute log-sigmoid loss for correct classifications
         # TODO
-        dot_in_out = torch.bmm(input_vectors, output_vectors).squeeze()
+        dot_in_out = torch.bmm(input_vectors.transpose(1,2), output_vectors).squeeze()
         out_loss = torch.nn.functional.logsigmoid(dot_in_out)
 
         # Compute log-sigmoid loss for incorrect classifications
         # TODO
-        dot_in_noise = torch.bmm(noise_vectors, input_vectors.transpose(1,2)).squeeze(2)
+        dot_in_noise = torch.bmm(noise_vectors, input_vectors).squeeze(2)
         noise_loss = torch.nn.functional.logsigmoid(-dot_in_noise).sum(dim=1)
 
         # Return the negative sum of the correct and noisy log-sigmoid losses, averaged over the batch

@@ -33,13 +33,15 @@ def train_skipgram(model: SkipGramNeg,
     """
     # Define loss and optimizer
     # TODO
-    criterion = None
+    criterion = NegativeSamplingLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-
+    
     steps = 0
     # Training loop
     for epoch in range(epochs):
-        for input_words, target_words in None:
+        print(epoch)
+        batches = get_batches(words, batch_size, window_size)
+        for input_words, target_words in batches:
             steps += 1
             # Convert inputs and context words into tensors
             inputs, targets = torch.LongTensor(input_words), torch.LongTensor(target_words)
@@ -47,22 +49,25 @@ def train_skipgram(model: SkipGramNeg,
 
             # input, output, and noise vectors
             # TODO
-            input_vectors = None
-            output_vectors = None
-            noise_vectors = None
+            input_vectors = model.forward_input(inputs)
+            output_vectors = model.forward_output(targets)
+            noise_vectors = model.forward_noise(inputs.shape[0], window_size)
             
             # negative sampling loss
             # TODO
-            loss = criterion(None, None, None)
+            loss = criterion(input_vectors, output_vectors, noise_vectors)
 
             # Backward step
             # TODO
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
             if steps % print_every == 0:
                 print(f"Epoch: {epoch+1}/{epochs}, Step: {steps}, Loss: {loss.item()}")
                 # Cosine similarity
                 # TODO
-                valid_examples, valid_similarities = cosine_similarity(None, device=device)
+                valid_examples, valid_similarities = cosine_similarity(model, batch_size, window_size,   device=device)
                 _, closest_idxs = valid_similarities.topk(6)
 
                 valid_examples, closest_idxs = valid_examples.to('cpu'), closest_idxs.to('cpu')
@@ -70,3 +75,4 @@ def train_skipgram(model: SkipGramNeg,
                     closest_words = [int_to_vocab[idx.item()] for idx in closest_idxs[ii]][1:]
                     print(int_to_vocab[valid_idx.item()] + " | " + ', '.join(closest_words))
                 print("...\n")
+        print("He terminado la epoch", epoch)

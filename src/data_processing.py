@@ -101,29 +101,11 @@ def get_target(words: List[str], idx: int, window_size: int = 5) -> List[str]:
         List[str]: A list of words selected randomly within the window around the target word.
     """
     # TODO
-    r = random.randint(1,window_size)
-    target_words: List[str] = []
-    vocab_int, int_vocab = create_lookup_tables(words)
-    if words:
-        #int_words = [vocab_int[w] for w in words]
-        int_words = words
-        if idx<r:
-            for i in int_words[:idx]:
-                target_words.append(i)
-        else:
-            for i in range(-r, 0):
-                target_words.append(int_words[idx+i])
-
-        if len(int_words)-idx <= r:
-            for i in int_words[idx+1:]:
-                target_words.append(i)
-        else:
-            for i in range(idx+1, idx+r+1):
-                target_words.append(int_words[i])
-    else:
-        target_words = []
-
-    return target_words
+    r = random.randint(1, window_size)
+    start_idx = max(0, idx - r)
+    end_idx = min(len(words), idx + r + 1)
+    
+    return [words[i] for i in range(start_idx, end_idx) if i != idx]
 
 def get_batches(words: List[int], batch_size: int, window_size: int = 5) -> Generator[None, None, None]:
     """Generate batches of word pairs for training.
@@ -190,9 +172,9 @@ def cosine_similarity(embedding: torch.nn.Embedding, valid_size: int = 16, valid
     valid_vectors = embedding(valid_examples)
 
     matrix_embeddings = embedding.weight 
-    matrix_norm = matrix_embeddings / torch.norm(matrix_embeddings, dim=1, keepdim=True)
+    matrix_norm = matrix_embeddings/torch.norm(matrix_embeddings, dim=1, keepdim=True)
     
-    valid_vectors_norm = valid_vectors / torch.norm(valid_vectors, dim=1, keepdim=True)
+    valid_vectors_norm = valid_vectors/torch.norm(valid_vectors, dim=1, keepdim=True)
     
     similarities = torch.matmul(valid_vectors_norm, matrix_norm.T)  
 

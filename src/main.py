@@ -9,7 +9,7 @@ except:
     from src.data_processing import load_and_preprocess_data, create_lookup_tables, subsample_words, get_batches, cosine_similarity
     from src.skipgram import SkipGramNeg
     from src.train import train_skipgram
-    from utils import plot_embeddings, save_model
+    from src.utils import plot_embeddings, save_model
 
 def main():
     print("Starting the SkipGram training pipeline...")
