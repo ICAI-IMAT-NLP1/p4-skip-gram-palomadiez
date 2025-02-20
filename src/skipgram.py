@@ -32,8 +32,8 @@ class SkipGramNeg(nn.Module):
 
         # Define embedding layers for input and output words
         # TODO
-        self.in_embed: nn.Embedding = None
-        self.out_embed: nn.Embedding = None
+        self.in_embed: nn.Embedding = nn.Embedding(n_vocab, n_embed)
+        self.out_embed: nn.Embedding = nn.Embedding(n_vocab, n_embed)
 
         # Initialize embedding tables with uniform distribution
         self.in_embed.weight.data.uniform_(-1, 1)
@@ -49,7 +49,7 @@ class SkipGramNeg(nn.Module):
             A tensor containing the input vectors for the given words.
         """
         # TODO
-        input_vectors: torch.Tensor = None
+        input_vectors: torch.Tensor = self.in_embed(input_words)
         return input_vectors
 
     def forward_output(self, output_words: torch.Tensor) -> torch.Tensor:
