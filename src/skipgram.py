@@ -62,7 +62,7 @@ class SkipGramNeg(nn.Module):
             A tensor containing the output vectors for the given words.
         """
         # TODO
-        output_vectors: torch.Tensor = None
+        output_vectors: torch.Tensor = self.out_embed(output_words)
         return output_vectors
 
     def forward_noise(self, batch_size: int, n_samples: int) -> torch.Tensor:
