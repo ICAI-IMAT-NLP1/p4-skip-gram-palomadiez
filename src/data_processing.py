@@ -50,7 +50,6 @@ def create_lookup_tables(words: List[str]) -> Tuple[Dict[str, int], Dict[int, st
 
     return vocab_to_int, int_to_vocab
 
-
 def subsample_words(words: List[str], vocab_to_int: Dict[str, int], threshold: float = 1e-5) -> Tuple[List[int], Dict[str, float]]:
     """
     Perform subsampling on a list of word integers using PyTorch, aiming to reduce the 
@@ -178,7 +177,23 @@ def cosine_similarity(embedding: torch.nn.Embedding, valid_size: int = 16, valid
     """
 
     # TODO
-    valid_examples: torch.Tensor = None
-    similarities: torch.Tensor = [(a*b)/(torch.abs(a)*torch.abs(b))]
+    valid_examples: torch.Tensor = []
+    i = 0
+    while i < valid_size:
+        j = random.randint(0,valid_window) 
+        if j not in valid_examples:
+            valid_examples.append(j)
+            i+=1
+
+    valid_examples = torch.tensor(valid_examples)
+
+    valid_vectors = embedding(valid_examples)
+
+    matrix_embeddings = embedding.weight 
+    matrix_norm = matrix_embeddings / torch.norm(matrix_embeddings, dim=1, keepdim=True)
+    
+    valid_vectors_norm = valid_vectors / torch.norm(valid_vectors, dim=1, keepdim=True)
+    
+    similarities = torch.matmul(valid_vectors_norm, matrix_norm.T)  
 
     return valid_examples, similarities
