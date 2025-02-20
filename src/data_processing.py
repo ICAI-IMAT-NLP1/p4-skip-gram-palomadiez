@@ -72,12 +72,20 @@ def subsample_words(words: List[str], vocab_to_int: Dict[str, int], threshold: f
     """
     # TODO
     # Convert words to integers
-    int_words: List[int] = [vocab_to_int[word] for word in words]
+    if not words:
+        return [], {}
     
-    freqs: Dict[str, float] = dict(Counter(int_words))
+    counts = dict(Counter(words))
+    total = len(words)
+        
+    freqs: Dict[str, float] = {word: word_count/total for word, word_count in counts.items()}
 
-    subsampling_prob = {word: (1-torch.sqrt(torch.tensor(threshold/freqs[word]))) for word in freqs.keys()}
-    train_words: List[str] = None
+    subsampling_prob = {word: (1-torch.sqrt(torch.tensor(threshold/word_freq))) for word, word_freq in freqs.items()}
+    
+    train_words: List[int] = []
+    for word in words:
+            if torch.rand(1).item() > subsampling_prob[word]:
+                train_words.append(vocab_to_int[word])
 
     return train_words, freqs
 
