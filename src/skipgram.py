@@ -83,14 +83,15 @@ class SkipGramNeg(nn.Module):
 
         # Sample words from our noise distribution
         # TODO
-        noise_words: torch.Tensor = None
+        noise_words: torch.Tensor = torch.multinomial(noise_dist, batch_size * n_samples, replacement=True)
+        noise_words_view = noise_words.view(batch_size, n_samples)
 
         device: str = "cuda" if self.out_embed.weight.is_cuda else "cpu"
         noise_words: torch.Tensor = noise_words.to(device)
 
         # Reshape output vectors to size (batch_size, n_samples, n_embed)
         # TODO
-        noise_vectors: torch.Tensor = None
+        noise_vectors: torch.Tensor = self.out_embed(noise_words_view)
 
         return noise_vectors
 
