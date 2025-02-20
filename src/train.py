@@ -39,7 +39,6 @@ def train_skipgram(model: SkipGramNeg,
     steps = 0
     # Training loop
     for epoch in range(epochs):
-        print(epoch)
         batches = get_batches(words, batch_size, window_size)
         for input_words, target_words in batches:
             steps += 1
@@ -75,4 +74,3 @@ def train_skipgram(model: SkipGramNeg,
                     closest_words = [int_to_vocab[idx.item()] for idx in closest_idxs[ii]][1:]
                     print(int_to_vocab[valid_idx.item()] + " | " + ', '.join(closest_words))
                 print("...\n")
-        print("He terminado la epoch", epoch)

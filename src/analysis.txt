@@ -1,0 +1,6 @@
+El modelo ha conseguido capturar determinados relaciones de significado entre algunas palabras,
+aunque si bien es cierto que hay muchas que no ya que el modelo no es especialmente preciso.
+Su funcionamineto se puede ver en palabras como "development" y "modern" que podrían tener un
+significado parecido en cuanto a progreso. Sin embargo, otras palabras como "second" y "third"
+que, a priori, deberían estar muy cerca, no lo están mostrando que el modelo tiene mucho rango 
+de mejora.

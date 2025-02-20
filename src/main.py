@@ -20,7 +20,7 @@ def main():
     
     embedding_dim = 300
     batch_size = 512
-    epochs = 5
+    epochs = 2
     learning_rate = 0.003
     window_size = 5
     print_every = 1500

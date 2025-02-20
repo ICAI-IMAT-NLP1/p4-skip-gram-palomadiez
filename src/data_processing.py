@@ -74,17 +74,13 @@ def subsample_words(words: List[str], vocab_to_int: Dict[str, int], threshold: f
     if not words:
         return [], {}
     
-    counts = dict(Counter(words))
-    total = len(words)
-        
-    freqs: Dict[str, float] = {word: word_count/total for word, word_count in counts.items()}
-
-    subsampling_prob = {word: (1-torch.sqrt(torch.tensor(threshold/word_freq))) for word, word_freq in freqs.items()}
-    
-    train_words: List[int] = []
-    for word in words:
-            if torch.rand(1).item() > subsampling_prob[word]:
-                train_words.append(vocab_to_int[word])
+    int_words: List[int] = [vocab_to_int[word] for word in words if word in vocab_to_int]
+   
+    word_counts: Counter = Counter(int_words)
+    total_count: int = len(int_words)
+    freqs: Dict[str, float] = {word: count / total_count for word, count in word_counts.items()}
+    p_drop: Dict[str, float] = {word: 1 - torch.sqrt(torch.tensor(threshold / freqs[word])) for word in word_counts}
+    train_words: List[int] = [word for word in int_words if torch.rand(1) < (1-p_drop.get(word,0))]
 
     return train_words, freqs
 
@@ -101,11 +97,25 @@ def get_target(words: List[str], idx: int, window_size: int = 5) -> List[str]:
         List[str]: A list of words selected randomly within the window around the target word.
     """
     # TODO
-    r = random.randint(1, window_size)
-    start_idx = max(0, idx - r)
-    end_idx = min(len(words), idx + r + 1)
-    
-    return [words[i] for i in range(start_idx, end_idx) if i != idx]
+    target_words: List[str] = None
+    r = random.randint(1,window_size)
+    target_words: List[str] = []
+
+    if idx<r:
+        for i in words[:idx]:
+            target_words.append(i)
+    else:
+        for i in range(-r, 0):
+            target_words.append(words[idx+i])
+
+    if len(words)-idx <= r:
+        for i in words[idx+1:]:
+            target_words.append(i)
+    else:
+        for i in range(idx+1, idx+r+1):
+            target_words.append(words[i])
+
+    return target_words
 
 def get_batches(words: List[int], batch_size: int, window_size: int = 5) -> Generator[None, None, None]:
     """Generate batches of word pairs for training.
